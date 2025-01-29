@@ -21,7 +21,6 @@ public class YEET : MonoBehaviour
         randomVector.x = Random.Range(0f,1f);
         randomVector.y = Random.Range(0f,1f);
         randomVector.z = Random.Range(0f,1f);
-        Debug.Log(randomVector);
         return randomVector.normalized;
     }
 
