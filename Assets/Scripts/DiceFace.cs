@@ -20,7 +20,7 @@ public class DiceFace : MonoBehaviour
 
     }
 
-
+    
 
     public string CheckFace()
     {
@@ -28,7 +28,7 @@ public class DiceFace : MonoBehaviour
 
         foreach (GameObject face in facesDuDes)
         {
-            if (face.transform.transform.up == Vector3.up)
+            if (face.transform.up == Vector3.up)
             {
                 faceDessusString = face.GetComponent<FaceComponent>().faceType;
             }
