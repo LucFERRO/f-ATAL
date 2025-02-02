@@ -7,7 +7,6 @@ public class DiceFace : MonoBehaviour
 
     public GameObject[] facesDuDes;
 
-
     // Update is called once per frame
     void Update()
     {
