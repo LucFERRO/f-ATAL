@@ -10,6 +10,11 @@ public class ResultManager : MonoBehaviour
     public string[] rollResults;
 
     public int numberOfDicesInUse;
+
+    [Header("Roll Parameters")]
+    public float rollThrowForce;
+    public float rollSpinForce;
+
     public int NumberOfDicesInUse
     {
         get
@@ -31,13 +36,31 @@ public class ResultManager : MonoBehaviour
         {
             allDiceDatas[i] = allDices[i].GetComponent<DiceData>();
         }
-
-
     }
 
     void Update()
     {
+        RollDices();
         UpdateRolledDices();
+    }
+
+    private void RollDices()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (dicesInUse.Length == 0)
+            {
+                Debug.Log("NO DICES SELECTED!");
+                return;
+            }
+
+            for (int i = 0; i < dicesInUse.Length; i++)
+            {
+                Vector3 randomSpinVector = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
+                dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * rollThrowForce, ForceMode.Impulse);
+                dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddTorque(randomSpinVector.normalized * rollSpinForce, ForceMode.Impulse);
+            }
+        }
     }
 
     private void UpdateDicesInUse()
@@ -62,18 +85,7 @@ public class ResultManager : MonoBehaviour
             }
         }
     }
-    private string GetDiceRollResult1(DiceData dice)
-    {
-        string rollResult = "";
-        foreach (GameObject face in dice.facesArray)
-        {
-            if (Vector3.Dot(face.transform.up, Vector3.up) == 1)
-            {
-                rollResult = face.GetComponent<FaceComponent>().faceType;
-            }
-        }
-        return rollResult;
-    }    
+
     private string GetDiceRollResult(DiceData dice)
     {
         string[] stringResultArray = new string[dice.numberOfFaces];
