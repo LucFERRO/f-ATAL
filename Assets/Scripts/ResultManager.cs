@@ -5,9 +5,23 @@ using UnityEngine;
 public class ResultManager : MonoBehaviour
 {
     private GameObject[] allDices;
-    private DiceData[] allDiceDatas;
-    private DiceData[] dicesInUse;
+    public DiceData[] allDiceDatas;
+    public DiceData[] dicesInUse;
     public string[] rollResults;
+
+    public int numberOfDicesInUse;
+    public int NumberOfDicesInUse
+    {
+        get
+        {
+            return numberOfDicesInUse;
+        }
+        set
+        {
+            numberOfDicesInUse = value;
+            UpdateDicesInUse();
+        }
+    }
     void Start()
     {
         allDices = GameObject.FindGameObjectsWithTag("Dice");
@@ -18,8 +32,7 @@ public class ResultManager : MonoBehaviour
             allDiceDatas[i] = allDices[i].GetComponent<DiceData>();
         }
 
-        dicesInUse = allDiceDatas.Where(dice => dice.GetComponent<DiceData>().isInUse).ToArray();
-        rollResults = new string[dicesInUse.Length];
+
     }
 
     void Update()
@@ -27,10 +40,22 @@ public class ResultManager : MonoBehaviour
         UpdateRolledDices();
     }
 
+    private void UpdateDicesInUse()
+    {
+        dicesInUse = allDiceDatas.Where(dice => dice.GetComponent<DiceData>().isInUse).ToArray();
+        rollResults = new string[dicesInUse.Length];
+    }
+
     private void UpdateRolledDices()
     {
         if (Input.GetKeyDown("space"))
         {
+            if (dicesInUse.Length == 0) { 
+                dicesInUse = new DiceData[0];
+                rollResults = new string[0];
+                return;
+            }
+
             for (int i = 0; i < dicesInUse.Length; i++)
             {
                 rollResults[i] = GetDiceRollResult(dicesInUse[i]);
