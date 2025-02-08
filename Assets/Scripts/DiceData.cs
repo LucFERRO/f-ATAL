@@ -22,6 +22,7 @@ public class DiceData : MonoBehaviour
     private void OnMouseOver()
     {
         if (Input.GetMouseButtonDown(0)) {
+            // Si clique pour ajouter un dé inactif alors que déjà le nombre max de dés sélectionnés
             if (!isInUse && resultManager.numberOfDicesInUse >= resultManager.maxNumberOfDices)
             {
                 Debug.Log($"Cannot use more than {resultManager.maxNumberOfDices} dices!");

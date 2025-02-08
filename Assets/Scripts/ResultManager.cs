@@ -52,6 +52,8 @@ public class ResultManager : MonoBehaviour
     {
         RollDices();
 
+        UpdateRolledDices();
+
         if (unusedDices.Length > 0)
         {
             return;
@@ -60,8 +62,6 @@ public class ResultManager : MonoBehaviour
         {
             UpdateUnusedDices();
         }
-
-        UpdateRolledDices();
     }
 
     private void RollDices()
@@ -76,14 +76,16 @@ public class ResultManager : MonoBehaviour
 
             for (int i = 0; i < dicesInUse.Length; i++)
             {
+                // Affecte le tag RolledDice aux dés utilisés
                 if (!dicesInUse[i].gameObject.CompareTag("RolledDice"))
                 {
                     dicesInUse[i].gameObject.tag = "RolledDice";
                 }
+
+                // Vecteur pour le throw (just up pour l'instant) et random vector pour le random spin, 2 vecteurs pour moins de chances d'avoir une rotation nulle (arrive toujours parfois)
+                dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * rollThrowForce, ForceMode.Impulse);
                 Vector3 randomSpinVector = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
                 Vector3 randomSpinVector2 = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
-
-                dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * rollThrowForce, ForceMode.Impulse);
                 dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddTorque((randomSpinVector.normalized + randomSpinVector2.normalized) * rollSpinForce, ForceMode.Impulse);
             }
             allRolledDices = GameObject.FindGameObjectsWithTag("RolledDice");
@@ -97,6 +99,7 @@ public class ResultManager : MonoBehaviour
     {
         if (allRolledDices.Length >= maxNumberOfDices)
         {
+            // Trie parmi tous les dés ceux qui ont toujours le tag "Dice" <=> ceux qui n'ont pas été roll
             unusedDices = allDices.Where(dice => dice.CompareTag("Dice")).ToArray();
             for (int i = 0; i < unusedDices.Length; i++)
             {
@@ -107,6 +110,7 @@ public class ResultManager : MonoBehaviour
 
     private void UpdateDicesInUse()
     {
+        // Trie parmi tous les dés ceux qui ont isInUse
         dicesInUse = allDiceDatas.Where(dice => dice.GetComponent<DiceData>().isInUse).ToArray();
         currentRollResults = new string[dicesInUse.Length];
     }
@@ -148,31 +152,17 @@ public class ResultManager : MonoBehaviour
         for (int i = 0; i < dice.numberOfFaces; i++)
         {
             stringResultArray[i] = dice.facesArray[i].GetComponent<FaceComponent>().faceType;
+            // /!\ /!\ /!\ AYMERIC A CHANGER LE TRANSFORM.UP EN TRANSFORM.FORWARD /!\ /!\ /!\
+            // Produit scalaire entre le vector.up de chaque face et Vector3.up
             vectorDotResultArray[i] = Vector3.Dot(dice.facesArray[i].transform.up, Vector3.up);
 
+            // Garde la face qui a son vecteur le plus vertical
             if (vectorDotResultArray[i] >= closestVectorDot)
             {
                 closestVectorDot = vectorDotResultArray[i];
                 closestIndex = i;
             }
         }
-        //Debug.Log("stringResultArray");
-        //for (int i = 0; i < dice.numberOfFaces; i++)
-        //{
-            
-        //    Debug.Log(i + " " +stringResultArray[i]);
-        //}        
-        
-        //Debug.Log("VectorDotResultArray");
-        //for (int i = 0; i < dice.numberOfFaces; i++)
-        //{
-            
-        //    Debug.Log(i + " "+ vectorDotResultArray[i]);
-        //}
-
-        //Debug.Log("closestVectorDot "+ closestVectorDot);
-        //Debug.Log("closestIndex " + closestIndex);
-
         return stringResultArray[closestIndex];
     }
 }
