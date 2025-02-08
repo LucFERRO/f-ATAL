@@ -5,15 +5,23 @@ using UnityEngine;
 public class ResultManager : MonoBehaviour
 {
     private GameObject[] allDices;
+    public GameObject[] unusedDices;
+    public GameObject[] allRolledDices;
     public DiceData[] allDiceDatas;
     public DiceData[] dicesInUse;
-    public string[] rollResults;
+    public DiceData[] globalDicesDataInUse;
 
     public int numberOfDicesInUse;
 
     [Header("Roll Parameters")]
+    public int maxNumberOfDices = 5;
     public float rollThrowForce;
     public float rollSpinForce;
+
+    [Header("Roll Results")]
+    public string[] currentRollResults;
+    public string[] globalRollResults;
+    public string[] possibleResults;
 
     public int NumberOfDicesInUse
     {
@@ -31,6 +39,8 @@ public class ResultManager : MonoBehaviour
     {
         allDices = GameObject.FindGameObjectsWithTag("Dice");
         allDiceDatas = new DiceData[allDices.Length];
+        globalDicesDataInUse = new DiceData[maxNumberOfDices];
+        globalRollResults = new string[maxNumberOfDices];
 
         for (int i = 0; i < allDices.Length; i++)
         {
@@ -41,6 +51,16 @@ public class ResultManager : MonoBehaviour
     void Update()
     {
         RollDices();
+
+        if (unusedDices.Length > 0)
+        {
+            return;
+        }
+        else
+        {
+            UpdateUnusedDices();
+        }
+
         UpdateRolledDices();
     }
 
@@ -50,15 +70,37 @@ public class ResultManager : MonoBehaviour
         {
             if (dicesInUse.Length == 0)
             {
-                Debug.Log("NO DICES SELECTED!");
+                Debug.Log("NO DICE SELECTED!");
                 return;
             }
 
             for (int i = 0; i < dicesInUse.Length; i++)
             {
+                if (!dicesInUse[i].gameObject.CompareTag("RolledDice"))
+                {
+                    dicesInUse[i].gameObject.tag = "RolledDice";
+                }
                 Vector3 randomSpinVector = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
+                Vector3 randomSpinVector2 = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
+
                 dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * rollThrowForce, ForceMode.Impulse);
-                dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddTorque(randomSpinVector.normalized * rollSpinForce, ForceMode.Impulse);
+                dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddTorque((randomSpinVector.normalized + randomSpinVector2.normalized) * rollSpinForce, ForceMode.Impulse);
+            }
+            allRolledDices = GameObject.FindGameObjectsWithTag("RolledDice");
+            for (int i = 0; i < allRolledDices.Length; i++)
+            {
+                globalDicesDataInUse[i] = allRolledDices[i].GetComponent<DiceData>();
+            }
+        }
+    }
+    private void UpdateUnusedDices()
+    {
+        if (allRolledDices.Length >= maxNumberOfDices)
+        {
+            unusedDices = allDices.Where(dice => dice.CompareTag("Dice")).ToArray();
+            for (int i = 0; i < unusedDices.Length; i++)
+            {
+                unusedDices[i].SetActive(false);
             }
         }
     }
@@ -66,7 +108,7 @@ public class ResultManager : MonoBehaviour
     private void UpdateDicesInUse()
     {
         dicesInUse = allDiceDatas.Where(dice => dice.GetComponent<DiceData>().isInUse).ToArray();
-        rollResults = new string[dicesInUse.Length];
+        currentRollResults = new string[dicesInUse.Length];
     }
 
     private void UpdateRolledDices()
@@ -75,14 +117,24 @@ public class ResultManager : MonoBehaviour
         {
             if (dicesInUse.Length == 0) { 
                 dicesInUse = new DiceData[0];
-                rollResults = new string[0];
+                currentRollResults = new string[0];
                 return;
             }
 
             for (int i = 0; i < dicesInUse.Length; i++)
             {
-                rollResults[i] = GetDiceRollResult(dicesInUse[i]);
+                currentRollResults[i] = GetDiceRollResult(dicesInUse[i]);
             }
+
+            //UpdateGlobalRollResults();
+        }
+    }
+
+    private void UpdateGlobalRollResults()
+    {
+        for (int i = 0; i < globalDicesDataInUse.Length; i++)
+        {
+            globalRollResults[i] = GetDiceRollResult(globalDicesDataInUse[i]);
         }
     }
 

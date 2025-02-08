@@ -22,6 +22,12 @@ public class DiceData : MonoBehaviour
     private void OnMouseOver()
     {
         if (Input.GetMouseButtonDown(0)) {
+            if (!isInUse && resultManager.numberOfDicesInUse >= resultManager.maxNumberOfDices)
+            {
+                Debug.Log($"Cannot use more than {resultManager.maxNumberOfDices} dices!");
+                return;
+            }
+
             isInUse = !isInUse;
             resultManager.NumberOfDicesInUse += isInUse ? 1 : -1;
         }
