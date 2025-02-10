@@ -11,6 +11,13 @@ public class init : MonoBehaviour
         
     }
 
+    /*
+     * debut semaine: rolls pour recolte
+     * chaque jour: roll actions parmi pools de dés selon events en cours
+     * temps passe en seamless sur la semaine, jour/nuit, events, jauges
+     */
+
+
     // Update is called once per frame
     void Update()
     {
