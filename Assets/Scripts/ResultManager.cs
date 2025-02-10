@@ -15,6 +15,8 @@ public class ResultManager : MonoBehaviour
 
     [Header("Roll Parameters")]
     public int maxNumberOfDices = 5;
+    public int maxNumberOfRolls = 2;
+    public int currentNumberOfRolls;
     public float rollThrowForce;
     public float rollSpinForce;
 
@@ -37,6 +39,7 @@ public class ResultManager : MonoBehaviour
     }
     void Start()
     {
+        currentNumberOfRolls = maxNumberOfRolls;
         allDices = GameObject.FindGameObjectsWithTag("Dice");
         allDiceDatas = new DiceData[allDices.Length];
         globalDicesDataInUse = new DiceData[maxNumberOfDices];
@@ -66,8 +69,14 @@ public class ResultManager : MonoBehaviour
 
     private void RollDices()
     {
+
         if (Input.GetKeyDown(KeyCode.R))
         {
+            if (currentNumberOfRolls <= 0)
+            {
+                Debug.Log("OUT OF REROLLS!");
+                return;
+            }
             if (dicesInUse.Length == 0)
             {
                 Debug.Log("NO DICE SELECTED!");
@@ -84,8 +93,8 @@ public class ResultManager : MonoBehaviour
 
                 // Vecteur pour le throw (just up pour l'instant) et random vector pour le random spin, 2 vecteurs pour moins de chances d'avoir une rotation nulle (arrive toujours parfois)
                 dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * rollThrowForce, ForceMode.Impulse);
-                Vector3 randomSpinVector = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
-                Vector3 randomSpinVector2 = new Vector3 (Random.Range(-1,1), Random.Range(-1, 1), Random.Range(-1, 1));
+                Vector3 randomSpinVector = new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1));
+                Vector3 randomSpinVector2 = new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1));
                 dicesInUse[i].gameObject.GetComponent<Rigidbody>().AddTorque((randomSpinVector.normalized + randomSpinVector2.normalized) * rollSpinForce, ForceMode.Impulse);
             }
             allRolledDices = GameObject.FindGameObjectsWithTag("RolledDice");
@@ -93,7 +102,10 @@ public class ResultManager : MonoBehaviour
             {
                 globalDicesDataInUse[i] = allRolledDices[i].GetComponent<DiceData>();
             }
+            // Utilise un roll
+            currentNumberOfRolls -= 1;
         }
+
     }
     private void UpdateUnusedDices()
     {
@@ -119,7 +131,8 @@ public class ResultManager : MonoBehaviour
     {
         if (Input.GetKeyDown("space"))
         {
-            if (dicesInUse.Length == 0) { 
+            if (dicesInUse.Length == 0)
+            {
                 dicesInUse = new DiceData[0];
                 currentRollResults = new string[0];
                 return;
@@ -130,7 +143,7 @@ public class ResultManager : MonoBehaviour
                 currentRollResults[i] = GetDiceRollResult(dicesInUse[i]);
             }
 
-            //UpdateGlobalRollResults();
+            UpdateGlobalRollResults();
         }
     }
 
@@ -138,6 +151,10 @@ public class ResultManager : MonoBehaviour
     {
         for (int i = 0; i < globalDicesDataInUse.Length; i++)
         {
+            if (globalDicesDataInUse[i] == null)
+            {
+                return;
+            }
             globalRollResults[i] = GetDiceRollResult(globalDicesDataInUse[i]);
         }
     }
