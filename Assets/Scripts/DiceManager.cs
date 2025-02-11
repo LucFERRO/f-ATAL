@@ -3,9 +3,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ResultManager : MonoBehaviour
+public class DiceManager : MonoBehaviour
 {
     private UiManager uiManager;
+    public GameObject diceSpawner;
     private GameObject[] allDices;
     public GameObject[] unusedDices;
     public GameObject[] allRolledDices;
@@ -42,9 +43,10 @@ public class ResultManager : MonoBehaviour
         set
         {
             currentNumberOfRolls = value;
-            if(currentNumberOfRolls < maxNumberOfRolls)
+            if (currentNumberOfRolls < maxNumberOfRolls)
             {
-                uiManager.confirmRollsButton.GetComponent<Button>().interactable = true;
+                uiManager.EnableConfirmButton();
+                uiManager.HideButton(uiManager.addDiceButton);
             }
             uiManager.UpdateNumberOfRollsLeft();
         }
@@ -67,20 +69,10 @@ public class ResultManager : MonoBehaviour
         uiManager = GetComponent<UiManager>();
         CurrentNumberOfRolls = maxNumberOfRolls;
         resultHolderPositions = new Vector3[] { resultHolder.transform.GetChild(0).transform.position, resultHolder.transform.GetChild(1).transform.position, resultHolder.transform.GetChild(2).transform.position, resultHolder.transform.GetChild(3).transform.position, resultHolder.transform.GetChild(4).transform.position };
-        allDices = GameObject.FindGameObjectsWithTag("Dice");
-        allDiceDatas = new DiceData[allDices.Length];
-        globalDicesDataInUse = new DiceData[maxNumberOfDices];
-        globalRollResults = new string[maxNumberOfDices];
-
-        for (int i = 0; i < allDices.Length; i++)
-        {
-            allDiceDatas[i] = allDices[i].GetComponent<DiceData>();
-        }
     }
 
     void Update()
     {
-        UpdateRolledDices();
 
         if (isConfirmed)
         {
@@ -89,7 +81,8 @@ public class ResultManager : MonoBehaviour
                 elapsedTime += Time.deltaTime;
                 percentageComplete = elapsedTime / resultMovementDuration;
                 PutDicesToResultHolder();
-            } else
+            }
+            else
             {
                 ResetResultInertia();
                 isConfirmed = false;
@@ -106,11 +99,25 @@ public class ResultManager : MonoBehaviour
 
     }
 
+    public void UpdateDiceData()
+    {
+        allDices = GameObject.FindGameObjectsWithTag("Dice");
+        allDiceDatas = new DiceData[allDices.Length];
+        globalDicesDataInUse = new DiceData[maxNumberOfDices];
+        globalRollResults = new string[maxNumberOfDices];
+
+        for (int i = 0; i < allDices.Length; i++)
+        {
+            allDiceDatas[i] = allDices[i].GetComponent<DiceData>();
+        }
+    }
+
     public void ConfirmRolls()
     {
         CurrentNumberOfRolls = 0;
         isConfirmed = true;
-        uiManager.confirmRollsButton.SetActive(false);
+        uiManager.HideButton(uiManager.confirmRollsButton);
+        UpdateRolledDices();
     }
 
     public void PutDicesToResultHolder()
@@ -186,22 +193,19 @@ public class ResultManager : MonoBehaviour
     }
     private void UpdateRolledDices()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (dicesInUse.Length == 0)
         {
-            if (dicesInUse.Length == 0)
-            {
-                dicesInUse = new DiceData[0];
-                currentRollResults = new string[0];
-                return;
-            }
-
-            for (int i = 0; i < dicesInUse.Length; i++)
-            {
-                currentRollResults[i] = GetDiceRollResult(dicesInUse[i]);
-            }
-
-            UpdateGlobalRollResults();
+            dicesInUse = new DiceData[0];
+            currentRollResults = new string[0];
+            return;
         }
+
+        for (int i = 0; i < dicesInUse.Length; i++)
+        {
+            currentRollResults[i] = GetDiceRollResult(dicesInUse[i]);
+        }
+
+        UpdateGlobalRollResults();
     }
 
     private void UpdateGlobalRollResults()

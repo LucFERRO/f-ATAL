@@ -6,13 +6,14 @@ using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
-    private ResultManager resultManager;
+    private DiceManager diceManager;
     public TMP_Text numberOfRollsLeftText;
     public GameObject confirmRollsButton;
+    public GameObject addDiceButton;
     void Start()
     {
-        resultManager = GetComponent<ResultManager>();
-        numberOfRollsLeftText.text = resultManager.maxNumberOfRolls.ToString();
+        diceManager = GetComponent<DiceManager>();
+        numberOfRollsLeftText.text = diceManager.maxNumberOfRolls.ToString();
         confirmRollsButton.GetComponent<Button>().interactable = false;
     }
 
@@ -24,6 +25,16 @@ public class UiManager : MonoBehaviour
 
     public void UpdateNumberOfRollsLeft()
     {
-        numberOfRollsLeftText.text = resultManager.currentNumberOfRolls.ToString();
+        numberOfRollsLeftText.text = diceManager.currentNumberOfRolls.ToString();
+    }
+
+    public void EnableConfirmButton()
+    {
+        confirmRollsButton.GetComponent<Button>().interactable = true;
+    }
+
+    public void HideButton(GameObject button)
+    {
+        button.SetActive(false);
     }
 }

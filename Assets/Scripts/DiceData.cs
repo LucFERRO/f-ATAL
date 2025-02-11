@@ -7,11 +7,11 @@ public class DiceData : MonoBehaviour
     public int numberOfFaces;
     public bool isInUse;
     [HideInInspector] public GameObject[] facesArray;
-    private ResultManager resultManager;
+    private DiceManager resultManager;
 
     void Start()
     {
-        resultManager = transform.parent.GetComponent<ResultManager>();
+        resultManager = transform.parent.GetComponent<DiceManager>();
         facesArray = new GameObject[numberOfFaces];
         for (int i = 0; i < transform.childCount; i++)
         {
