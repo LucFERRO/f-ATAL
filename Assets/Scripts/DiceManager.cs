@@ -7,7 +7,7 @@ public class DiceManager : MonoBehaviour
 {
     private UiManager uiManager;
     public GameObject diceSpawner;
-    private GameObject[] allDices;
+    public GameObject[] allDices;
     public GameObject[] unusedDices;
     public GameObject[] allRolledDices;
     public DiceData[] allDiceDatas;

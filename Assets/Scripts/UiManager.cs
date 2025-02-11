@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
-    private DiceManager diceManager;
+    public DiceManager diceManager;
     public TMP_Text numberOfRollsLeftText;
     public GameObject confirmRollsButton;
     public GameObject addDiceButton;
     void Start()
     {
-        diceManager = GetComponent<DiceManager>();
+        //diceManager = GetComponent<DiceManager>();
         numberOfRollsLeftText.text = diceManager.maxNumberOfRolls.ToString();
         confirmRollsButton.GetComponent<Button>().interactable = false;
     }
