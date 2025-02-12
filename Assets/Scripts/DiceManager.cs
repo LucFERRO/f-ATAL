@@ -117,6 +117,7 @@ public class DiceManager : MonoBehaviour
         CurrentNumberOfRolls = 0;
         isConfirmed = true;
         uiManager.HideButton(uiManager.confirmRollsButton);
+        uiManager.HideButton(uiManager.rollButton);
         UpdateRolledDices();
     }
 

@@ -10,6 +10,7 @@ public class UiManager : MonoBehaviour
     public TMP_Text numberOfRollsLeftText;
     public GameObject confirmRollsButton;
     public GameObject addDiceButton;
+    public GameObject rollButton;
     void Start()
     {
         //diceManager = GetComponent<DiceManager>();
